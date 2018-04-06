@@ -1,8 +1,13 @@
 var express = require('express');
 var mongoose=require('mongoose');
+var bodyParser=require('body-parser');
+
 var Book=require('./models/bookModel')
 
 var monApp=express();
+monApp.use(bodyParser.urlencoded({extended:true}));
+monApp.use(bodyParser.json());
+
 var db=mongoose.connect('mongodb://localhost/bookAPI')
 .then(
     function(){console.log('connected to mongo successfully');},
@@ -21,7 +26,6 @@ booksRouter.route('/Books')
         if(!!req.query.genre){
             query.genre=req.query.genre;
         }
-
         Book.find(query, function(err,books){
             debugger;
             if(err)
@@ -31,7 +35,11 @@ booksRouter.route('/Books')
         })
     })
     .post(function (req, res) {
-        res.send('Add a book');
+        // res.send('Add a book');
+        var book= new Book(req.body); // the body parser has already read the json in the body of the request
+        book.save();
+        console.log(book);
+        res.status(201).send(book);//status 201 is created
     })
     .put(function (req, res) {
         res.send('Update a book');
