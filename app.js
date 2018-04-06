@@ -18,9 +18,10 @@ process.on('unhandledRejection', error => {
     console.log('unhandledRejection', error);
   });
 
-  booksRouter=require('./routes/bookRouter')(Book);
+booksRouter=require('./routes/bookRouter')(Book);
 
-monApp.use('/API',booksRouter);
+monApp.use('/API/Books',booksRouter);
+// monApp.use('/API/Authors',authorsRouter);
 
 monApp.get(['/get/','/'],function(req,res){
     res.send('momo needs to create more projects!');
