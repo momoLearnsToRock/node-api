@@ -3,7 +3,7 @@ var express=require('express');
 //and because basically all the crud functions are the same for all models.
 var routes=function(Book){
     var booksRouter=express.Router(); //looks at the actual objects it is not monApp.Router
-    booksRouter.route('/Books') 
+    booksRouter.route('/') 
         .get(function(req,res){
             //res.send('Get a random book');
             var query={}; //this is to avoid filteration on whatever the user inputs in the querystring.
@@ -28,30 +28,30 @@ var routes=function(Book){
         .put(function (req, res) {
             res.send('Update a book');
         });
-    booksRouter.route('/Books/:bookId') 
+
+    //this is a middleware used for all the functions chained to routes that have the adress "/:bookId"        
+    booksRouter.use('/:bookId',function(req,res,next){
+        Book.findById(req.params.bookId, function(err,book){
+            if(err)
+                res.status(500).send(err);
+            else
+                req.book=book;
+                next();
+        });
+    });        
+    booksRouter.route('/:bookId') 
         .get(function(req,res){
+            ////note that the error scenario is handled in the middleware
             //res.send('Get a specific book by id');
-            Book.findById(req.params.bookId, function(err,book){
-                debugger;
-                if(err)
-                    res.status(500).send(err);
-                else
-                    res.json(book);
-            });
+            res.json(req.book);
         })
         .put(function(req,res){
-            Book.findById(req.params.bookId, function(err, book){
-                if(err)
-                    res.status(500).send(err);
-                else{
-                    book.title=req.body.title;
-                    book.author=req.body.author;
-                    book.genre=req.body.genre;
-                    book.read=req.body.read; 
-                    book.save();                   
-                    res.json(book);
-                }
-            });
+            req.book.title=req.body.title;
+            req.book.author=req.body.author;
+            req.book.genre=req.body.genre;
+            req.book.read=req.body.read; 
+            req.book.save();                   
+            res.json(req.book);
         });
     return booksRouter;
 }
