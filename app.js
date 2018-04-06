@@ -36,6 +36,19 @@ booksRouter.route('/Books')
     .put(function (req, res) {
         res.send('Update a book');
     });
+booksRouter.route('/Books/:bookId') 
+    .get(function(req,res){
+        //res.send('Get a specific book by id');
+        Book.findById(req.params.bookId, function(err,book){
+            debugger;
+            if(err)
+                res.status(500).send(err);
+            else
+                res.json(book);
+        });
+    })
+
+
 monApp.use('/API',booksRouter);
 
 monApp.get(['/get/','/'],function(req,res){
