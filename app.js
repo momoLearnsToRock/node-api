@@ -3,11 +3,11 @@ var mongoose=require('mongoose');
 var Book=require('./models/bookModel')
 
 var monApp=express();
-var db=mongoose.connect('mongodb:localhost/bookedAPI')
-// .then(
-//     function(){console.log('connected to mongo successfully');},
-//     function(err){console.log('failed to connect to mongo');}
-// );
+var db=mongoose.connect('mongodb://localhost/bookAPI')
+.then(
+    function(){console.log('connected to mongo successfully');},
+    function(err){console.log('failed to connect to mongo');}
+);
 
 process.on('unhandledRejection', error => {
     console.log('unhandledRejection', error);
@@ -17,7 +17,12 @@ var booksRouter=express.Router(); //looks at the actual objects it is not monApp
 booksRouter.route('/Books') 
     .get(function(req,res){
         //res.send('Get a random book');
-        Book.find(function(err,books){
+        var query={}; //this is to avoid filteration on whatever the user inputs in the querystring.
+        if(!!req.query.genre){
+            query.genre=req.query.genre;
+        }
+
+        Book.find(query, function(err,books){
             debugger;
             if(err)
                 res.status(500).send(err);
